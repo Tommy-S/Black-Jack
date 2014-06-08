@@ -1,0 +1,116 @@
+# Black Jack
+
+import random
+
+# useful global variables
+score = 0
+
+# class definitions
+ranks = ('Ace','2','3','4','5','6','7','8','9','10','Jack','Queen','King')
+values = {'Ace':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'Jack':10,'Queen':10,'King':10}
+suits = ('Diamonds','Hearts','Clubs','Spades')
+
+class Card:
+    def __init__(self, suit, rank):
+        self.suit = suit
+        self.rank = rank
+    def __str__(self):
+        return (str(self.rank + ' of ' + self.suit))
+    def get_rank(self):
+        return self.rank
+
+class Deck:
+    def __init__(self):
+        self.deck = []
+        for suit in suits:
+            for rank in ranks:
+                self.deck.append(Card(suit,rank))
+    def deal_card(self):
+        self.card = self.deck[0]
+        self.deck.remove(self.card)
+        return self.card
+    def shuffle(self):
+        random.shuffle(self.deck)
+class Hand:
+    def __init__(self):
+        self.hand = []
+    def __str__(self):
+        hand = ''
+        for card in self.hand:
+            hand = hand + '\n' + str(card)
+        return str(hand)
+    def add_card(self,card):        
+        self.hand.append(card)
+    def get_value(self):
+        value = 0
+        aces = 0
+        for card in self.hand:
+            if card.get_rank() == 'Ace':
+                aces += 1
+            value += values.get(card.get_rank())
+
+        if ((aces>0) and (value + 10 <= 21)):
+            value += 10
+        return int(value)
+            
+def deal():
+    global player,dealer,deck_object
+    deck_object = Deck()
+    player = Hand()
+    dealer = Hand()
+    deck_object.shuffle()
+    player.add_card(deck_object.deal_card())
+    player.add_card(deck_object.deal_card())
+    dealer.add_card(deck_object.deal_card())
+    dealer.add_card(deck_object.deal_card())
+    prompt()
+
+def prompt():
+    global player
+    print ('\n' + 'Score: '+str(score))
+    print ('\n' + 'Your hand contains:' + player.__str__())
+    print ('\n' + "Dealer's hand contains:" + dealer.__str__())
+    print ('\n' + 'Hit or Stand')
+    response = input()
+    if response == 'Hit':
+        hit()
+    elif response == 'Stand':
+        stand()
+    else:
+        print ('Invalid choice,please try again.')
+        prompt()
+        
+def hit():
+    global score, player,deck_object,value
+    player.add_card(deck_object.deal_card())
+    if player.get_value()>21:
+        print ('\n' + 'Your hand contains:' + player.__str__())
+        print ( '\n' + "Dealer's hand contains:" + dealer.__str__() + '\n')
+        print ('You have busted. Dealer wins')
+        score -= 1
+        deal()
+    else:
+        prompt()
+        
+def stand():
+    global score, dealer, deck_object,value
+    while player.get_value() > dealer.get_value():
+        dealer.add_card(deck_object.deal_card())
+        print ( '\n' + "Dealer's hand contains:" + dealer.__str__() + '\n') 
+    if dealer.get_value() > 21:
+        print ('\n' + 'Your hand contains:' + player.__str__())
+        print ('Dealer has busted. You win!')
+        score += 1
+        deal()
+    elif dealer.get_value() >= player.get_value():
+        print ('\n' + 'Your hand contains:' + player.__str__())
+        print ('Dealer wins.')
+        score -= 1
+        deal()
+    elif dealer.get_value() < player.get_value():
+        print ('\n' + 'Your hand contains:' + player.__str__())
+        print ('Player wins.')
+        score += 1
+        deal()
+
+deal()
