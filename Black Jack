@@ -1,7 +1,5 @@
 # Black Jack
 
-import random
-
 # useful global variables
 score = 0
 
